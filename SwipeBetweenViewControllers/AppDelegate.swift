@@ -17,21 +17,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         // Create a horizontal scrolling view controller
-        var pageController = UIPageViewController(
+        let pageController = UIPageViewController(
             transitionStyle: UIPageViewControllerTransitionStyle.Scroll, //Set the transition style to scroll
             navigationOrientation: UIPageViewControllerNavigationOrientation.Horizontal, // Horizontal scrolling only
             options: nil
         )
         
         // Create the navigation controller that the app will use as the main navigation controller and set the root view to the pageController above
-        var navigationController = JXSwipeBetweenViewControllers(rootViewController: pageController)
+        let navigationController = JXSwipeBetweenViewControllers(rootViewController: pageController)
         
         // Set the background to white or to whatever you like
         navigationController.view.backgroundColor = UIColor.lightGrayColor()
 
-        var leftView = UIViewController();
-        var middleView = UIViewController();
-        var rightView = UIViewController();
+        let leftView = UIViewController();
+        let middleView = UIViewController();
+        let rightView = UIViewController();
         
         leftView.view.backgroundColor = UIColor.brownColor()
         middleView.view.backgroundColor = UIColor.whiteColor()
