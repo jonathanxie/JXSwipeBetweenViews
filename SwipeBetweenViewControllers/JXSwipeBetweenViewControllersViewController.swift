@@ -115,9 +115,9 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
         rightButton.setTitleColor(UIColor.blackColor(), forState: UIControlState.Normal)
         
         // Add an action to the buttons to mimic view swiping on tap
-        leftButton.addTarget(self, action: "touchedNavBarButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        middleButton.addTarget(self, action: "touchedNavBarButton:", forControlEvents: UIControlEvents.TouchUpInside)
-        rightButton.addTarget(self, action: "touchedNavBarButton:", forControlEvents: UIControlEvents.TouchUpInside)
+        leftButton.addTarget(self, action: #selector(JXSwipeBetweenViewControllers.touchedNavBarButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        middleButton.addTarget(self, action: #selector(JXSwipeBetweenViewControllers.touchedNavBarButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
+        rightButton.addTarget(self, action: #selector(JXSwipeBetweenViewControllers.touchedNavBarButton(_:)), forControlEvents: UIControlEvents.TouchUpInside)
         
         // Set the font of the buttons to use FontAwesome icons
         leftButton.titleLabel!.font = UIFont.fontAwesomeOfSize(30)
@@ -175,21 +175,23 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
         
         if (!self.isPageScrollingFlag) {
         
-            println("self.currentPageIndex = \(self.currentPageIndex)")
+            print("self.currentPageIndex = \(self.currentPageIndex)")
             
-            var tempIndex = self.currentPageIndex
+            let tempIndex = self.currentPageIndex
 
             // Check to see if you're going from left -> right or right -> left
             if (button.tag > tempIndex) {
+                print(button.tag)
                 
                 //println("Going forward since button.tag = \(button.tag)")
 
                 //scroll through all the objects between the two points
-                var i:Int = tempIndex;
-                for i = tempIndex+1; i <= button.tag; i++ {
 
+                for i in ((tempIndex+1)...button.tag) {
+
+                    print(i)
                     //println("i in forward for loop = \(i) and button.tag = \(button.tag)")
-                    
+
                     pageController.setViewControllers(
                         [viewControllerArray[i]],
                         direction: UIPageViewControllerNavigationDirection.Forward,
@@ -198,7 +200,7 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
                             
                             if(complete) {
                                 //println("i in complete forward for loop = \(i) and button.tag = \(button.tag)")
-                                self.updateCurrentPageIndex(i-1) // I had an off by 1 error here for some reason
+                                self.updateCurrentPageIndex(i)
                             }
                         }
                     )
@@ -206,10 +208,12 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
             }
             
             else if (button.tag < tempIndex) {
+                print(button.tag)
                 
                 //println("Going reverse since button.tag = \(button.tag)")
-                var i:Int = tempIndex;
-                for i = tempIndex-1; i >= button.tag; i-- {
+
+                for i in (button.tag...tempIndex-1).reverse() {
+                    print(i)
                     //println("i in reverse for loop = \(i) and button.tag = \(button.tag)")
                     pageController.setViewControllers([viewControllerArray[i]],
                         direction: UIPageViewControllerNavigationDirection.Reverse,
@@ -217,7 +221,7 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
                         completion: {[unowned self] (complete:Bool) -> Void in
                             if(complete) {
                                 //println("i in complete reverse for loop = \(i) and button.tag = \(button.tag)")
-                                self.updateCurrentPageIndex(i+1) // I had an off by 1 error here for some reason
+                                self.updateCurrentPageIndex(i)
                             }
                         }
                     )
@@ -228,7 +232,7 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
     
     // Make sure to update the current index after swiping or touching the button is done
     func updateCurrentPageIndex(newIndex:Int) {
-        println("updateCurrentPagIndex: Index = \(newIndex)");
+        print("updateCurrentPagIndex: Index = \(newIndex)");
         self.currentPageIndex = newIndex;
     }
     
@@ -243,18 +247,18 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
         // Starting point here in this case is View 1
         // xFromCenter is positive for swiping your thumb right to left going the View 1 to View 0
         // xFromCenter is negative for swiping your thumb left to right going from View 1 to View 2
-        var xFromCenter:CGFloat = self.view.frame.size.width - scrollView.contentOffset.x;
+        let xFromCenter:CGFloat = self.view.frame.size.width - scrollView.contentOffset.x;
         
-        println("xFromCenter = \(xFromCenter)")
-        println("scrollView.contentOffset.x = \(scrollView.contentOffset.x)")
+        print("xFromCenter = \(xFromCenter)")
+        print("scrollView.contentOffset.x = \(scrollView.contentOffset.x)")
         
         if (xFromCenter == 0) {
             return;
         }
 
-        var distanceBetweenButtons:CGFloat = middleButton.frame.origin.x - leftButton.frame.origin.x
+        let distanceBetweenButtons:CGFloat = middleButton.frame.origin.x - leftButton.frame.origin.x
         
-        var distanceToShift:CGFloat = distanceBetweenButtons/self.view.frame.size.width
+        let distanceToShift:CGFloat = distanceBetweenButtons/self.view.frame.size.width
         
         //The xCoord for shifting the navigation view based on what
         var xCoor:CGFloat = 0;
@@ -281,7 +285,7 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
             return nil;
         }
         
-        index--;
+        index -= 1;
         
         return viewControllerArray[index];
         
@@ -295,7 +299,7 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
             return nil;
         }
         
-        index++;
+        index += 1;
         
         if (index == viewControllerArray.count) {
             return nil;
@@ -305,10 +309,12 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
     }
     
     
-    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [AnyObject], transitionCompleted completed: Bool) {
+    func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         
         if(completed) {
-            currentPageIndex = indexOfController(pageViewController.viewControllers.last as! UIViewController);
+            if let vc = pageViewController.viewControllers!.last {
+                currentPageIndex = indexOfController(vc)
+            }
         }
     }
     
@@ -318,7 +324,7 @@ class JXSwipeBetweenViewControllers: UINavigationController, UIPageViewControlle
     func indexOfController(viewController:UIViewController) -> Int {
         for i in 0..<viewControllerArray.count {
             if viewController == viewControllerArray[i] {
-                println("indexOfController = \(i)")
+                print("indexOfController = \(i)")
                 return i;
             }
         }
